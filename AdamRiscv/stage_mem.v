@@ -1,4 +1,4 @@
-`include "./AdamRiscv/define.vh"
+`include "../define.vh"
 
 module stage_mem(
     input  wire        clk,
@@ -11,6 +11,9 @@ module stage_mem(
     //forwarding
     input wire         forward_data,
     input wire[31:0]   w_regs_data,
+    input wire[31:0]   me_inst,
+    input wire[31:0]   me_matrix_line_data,
+    input wire         me_matrix2mem,
 
     output wire[31:0]  me_mem_data
 );
@@ -33,9 +36,10 @@ u_data_memory(
     .r_data_mem (r_data_mem        )
 );
 
-assign w_data_mem  = forward_data ? w_regs_data : me_regs_data2;
+assign w_data_mem  = me_matrix2mem ? me_matrix_line_data : forward_data ? w_regs_data : me_regs_data2;
 
-assign me_mem_data = (me_func3_code == `LB) ? {{24{r_data_mem[7]}},r_data_mem[7:0]}:
+assign me_mem_data = ({me_inst[14:12], me_inst[6:0]} == `MtypeL) ? r_data_mem:
+                     (me_func3_code == `LB) ? {{24{r_data_mem[7]}},r_data_mem[7:0]}:
                      (me_func3_code == `LH) ? {{16{r_data_mem[7]}},r_data_mem[15:0]}:
                      (me_func3_code == `LBU)? {24'b0,r_data_mem[7:0]}:
                      (me_func3_code == `LHU)? {16'b0,r_data_mem[15:0]}:

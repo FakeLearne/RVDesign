@@ -23,6 +23,18 @@ module reg_id_ex(
     //forwarding
     input wire[4:0] id_rs1,
     input wire[4:0] id_rs2,
+
+    input wire[1:0] id_matrix_index,
+    input wire[31:0] id_inst,
+    input wire id_mem2matrix,
+    input wire id_matrix_write,
+    input wire id_matrix_write_mopa,
+    input wire[1:0] id_mem_matrix2reg,
+    input wire[31:0] id_matrix_line_data,
+    input wire id_mem_reg2matrix,
+    input wire id_matrix2mem,
+    input wire[31:0] id_M[3:0],
+
     output reg[4:0] ex_rs1,
     output reg[4:0] ex_rs2,
 
@@ -41,7 +53,18 @@ module reg_id_ex(
     output reg[1:0]   ex_alu_src1,
     output reg[1:0]   ex_alu_src2,
     output reg        ex_br_addr_mode,
-    output reg        ex_regs_write
+    output reg        ex_regs_write,
+
+    output reg[1:0]  ex_matrix_index,
+    output reg[31:0] ex_inst,
+    output reg       ex_mem2matrix,
+    output reg       ex_matrix_write,
+    output reg       ex_matrix_write_mopa,
+    output reg[1:0]  ex_mem_matrix2reg,
+    output reg[31:0] ex_matrix_line_data,
+    output reg       ex_mem_reg2matrix,
+    output reg       ex_matrix2mem,
+    output reg[31:0] ex_M[3:0]
 );
 always @(posedge clk) begin
     if (!rst || id_ex_flush)begin
@@ -64,6 +87,20 @@ always @(posedge clk) begin
 
         ex_rs1          <= 0;
         ex_rs2          <= 0;
+
+        ex_matrix_index <= 0;
+        ex_inst <= 0;
+        ex_mem2matrix <= 0;
+        ex_matrix_write <= 0;
+        ex_matrix_write_mopa <= 0;
+        ex_mem_matrix2reg <= 0;
+        ex_matrix_line_data <= 0;
+        ex_mem_matrix2reg <= 0;
+        ex_matrix2mem <= 0;
+        ex_M[0] <= 0;
+        ex_M[1] <= 0;
+        ex_M[2] <= 0;
+        ex_M[3] <= 0;
     end 
     else begin
         ex_pc           <= id_pc;
@@ -85,6 +122,17 @@ always @(posedge clk) begin
 
         ex_rs1          <= id_rs1;
         ex_rs2          <= id_rs2;
+
+        ex_matrix_index <= id_matrix_index;
+        ex_inst <= id_inst;
+        ex_mem2matrix <= id_mem2matrix;
+        ex_matrix_write <= id_matrix_write;
+        ex_matrix_write_mopa <= id_matrix_write_mopa;
+        ex_mem_matrix2reg <= id_mem_matrix2reg;
+        ex_matrix_line_data <= id_matrix_line_data;
+        ex_mem_reg2matrix <= id_mem_reg2matrix;
+        ex_matrix2mem <= id_matrix2mem;
+        ex_M <= id_M;
     end
     $display("ex_regs_data1: %h",ex_regs_data1 );
     $display("ex_regs_data2: %h",ex_regs_data2 );

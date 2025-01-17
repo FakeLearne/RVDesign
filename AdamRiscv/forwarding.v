@@ -1,4 +1,4 @@
-`include "./AdamRiscv/define.vh"
+`include "../define.vh"
 
 
 module forwarding(

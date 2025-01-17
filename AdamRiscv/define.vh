@@ -8,7 +8,12 @@
 `define UtypeL 7'b0110111 //Utype for lui
 `define UtypeU 7'b0010111 //Utype for auipc
 `define Jtype  7'b1101111 //Utype for jal
- 
+
+`define MtypeL  10'b0000001011 // ld.tile M[index], imm12(rs1)
+`define MtypeS  10'b0010001011 // st.tile M[index], imm12(rs1)
+`define MtypeM1 10'b0110001011 // mov.tile rd, M[index]
+`define MtypeM2 10'b0100001011 // mov.tile M[index], rs1
+`define MtypePA 10'b1000001011 // mopa rs1, rs2
 
 //-------------------ALU_MODE------------------
 `define ADD    4'd0 
@@ -25,6 +30,7 @@
 `define SGE    4'd11   // set greater than
 `define SGEU   4'd12  // set greater than unsigned
 `define JUMP   4'd13   // FOR JAL,JALR
+`define MATRIX_MUL 4'd14 // FOR Matrix MUL
 
 //-------------------Itype_Func3----------------
 `define I_ADDI  3'b000
@@ -70,6 +76,7 @@
 `define IMM         2'b01
 `define PC_PLUS4    2'b10
 `define REG         2'b00
+`define MATRIX_M1   2'b11
 
 `define PC          2'b10
 `define NULL        2'b01

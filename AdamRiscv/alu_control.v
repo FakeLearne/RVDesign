@@ -1,4 +1,4 @@
-`include "./AdamRiscv/define.vh"
+`include "../define.vh"
 
 module alu_control(
     input wire[2:0] alu_op,
@@ -56,6 +56,10 @@ always @(*) begin
 
         3'b100: //`ItypeJ,`Jtype
             alu_ctrl_r = `JUMP;
+
+        3'b101: //`MtypePA
+            alu_ctrl_r = `MATRIX_MUL;
+
         default   : alu_ctrl_r = 4'b1111;
 
     /*

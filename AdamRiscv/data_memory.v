@@ -13,6 +13,8 @@ module data_memory #(
 
 reg [7:0] data [DROM_SPACE-1:0];
 
+initial $readmemh ("../rom/test_data.hex",data);
+
 /*----------------Write DataMemory---------------------*/
 always @(posedge clk) begin
     if (w_en_mem && !r_en_mem && rst)begin

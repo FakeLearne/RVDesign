@@ -1,0 +1,34 @@
+
+./1-test-mov.tile-toIntReg.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00000000 <_start>:
+   0:	00000117          	auipc	sp,0x0
+   4:	00010113          	mv	sp,sp
+
+00000008 <main>:
+   8:	555551b7          	lui	gp,0x55555
+   c:	55518193          	addi	gp,gp,1365 # 55555555 <pass+0x55555505>
+  10:	0000328b          	0x328b
+  14:	02519c63          	bne	gp,t0,4c <fail>
+  18:	aaaab1b7          	lui	gp,0xaaaab
+  1c:	aaa18193          	addi	gp,gp,-1366 # aaaaaaaa <pass+0xaaaaaa5a>
+  20:	0010328b          	0x10328b
+  24:	02519463          	bne	gp,t0,4c <fail>
+  28:	333331b7          	lui	gp,0x33333
+  2c:	33318193          	addi	gp,gp,819 # 33333333 <pass+0x333332e3>
+  30:	0020328b          	0x20328b
+  34:	00519c63          	bne	gp,t0,4c <fail>
+  38:	ccccd1b7          	lui	gp,0xccccd
+  3c:	ccc18193          	addi	gp,gp,-820 # cccccccc <pass+0xcccccc7c>
+  40:	0030328b          	0x30328b
+  44:	00519463          	bne	gp,t0,4c <fail>
+  48:	0080006f          	j	50 <pass>
+
+0000004c <fail>:
+  4c:	00000063          	beqz	zero,4c <fail>
+
+00000050 <pass>:
+  50:	00000063          	beqz	zero,50 <pass>

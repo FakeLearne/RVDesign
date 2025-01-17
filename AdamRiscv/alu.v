@@ -1,4 +1,4 @@
-`include "./AdamRiscv/define.vh"
+`include "../define.vh"
 
 module alu(
     input  wire[3:0]     alu_ctrl,
@@ -24,6 +24,7 @@ always @(alu_ctrl, op_A, op_B) begin
         `SLL        : alu_o = op_A << op_B[4:0];
         `SRL        : alu_o = op_A >> op_B[4:0];
         `SRA        : alu_o = ($signed(op_A)) >>> op_B[4:0];
+        `MATRIX_MUL : alu_o = 0;
         default: alu_o = 0;
     endcase
 end

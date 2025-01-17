@@ -6,7 +6,7 @@ module inst_memory #(
 );
 
 reg [7:0] inst [IROM_SPACE-1:0];
-initial $readmemh ("./AdamRiscv/rom/test_program.hex",inst);
+initial $readmemh ("../rom/test_program.hex",inst);
 //initial $readmemh ("./AdamRiscv/rom/test2_program.txt",inst);
 
 assign inst_o[7:0]   = inst[inst_addr];

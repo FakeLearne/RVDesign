@@ -6,6 +6,13 @@ module stage_id(
     input wire[4:0]    w_regs_addr,
     input wire[31:0]   w_regs_data,
     input wire         ctrl_stall,
+
+    input wire w_matrix_en,
+    input wire w_matrix_en_mopa,
+    input wire[1:0] w_matrix_index,
+    input wire[31:0] w_matrix_data,
+    input wire[31:0] w_matrix_data_mopa[3:0],
+
     output  wire[31:0] id_regs_data1,
     output  wire[31:0] id_regs_data2,
     output  wire[31:0] id_imm,
@@ -23,8 +30,18 @@ module stage_id(
     output  wire       id_regs_write,
     //forwarding
     output  wire[4:0]  id_rs1,
-    output  wire[4:0]  id_rs2
+    output  wire[4:0]  id_rs2,
 
+    // matrix
+    output wire[1:0] id_matrix_index,
+    output wire id_mem2matrix,
+    output wire id_matrix_write,
+    output wire id_matrix_write_mopa,
+    output wire[1:0] id_mem_matrix2reg,
+    output wire[31:0] id_matrix_line_data,
+    output wire id_mem_reg2matrix,
+    output wire id_matrix2mem,
+    output wire[31:0] id_M[3:0]
 );
 
 wire        br          ;
@@ -37,6 +54,19 @@ wire[1:0]   alu_src2    ;
 wire        br_addr_mode;
 wire        regs_write  ;
 
+matrix_data u_matrix(
+    .clk(clk),
+    .rst(rst),
+    .r_matrix_index(id_matrix_index),
+    .w_matrix_index(w_matrix_index),
+    .w_matrix_data(w_matrix_data),
+    .w_matrix_data_mopa(w_matrix_data_mopa),
+
+    .w_matrix_en(w_matrix_en),
+    .w_matrix_en_mopa(w_matrix_en_mopa),
+    .r_matrix_o(id_matrix_line_data),
+    .M_out(id_M)
+);
 
 regs u_regs(
     .clk          (clk              ),
@@ -51,6 +81,7 @@ regs u_regs(
 );
 
 ctrl u_ctrl(
+    .inst           (id_inst),
     .inst_op        (id_inst[6:0] ),
     .br             (br           ),
     .mem_read       (mem_read     ),
@@ -60,7 +91,12 @@ ctrl u_ctrl(
     .alu_src1       (alu_src1     ),
     .alu_src2       (alu_src2     ),
     .br_addr_mode   (br_addr_mode ),
-    .regs_write     (regs_write   )
+    .regs_write     (regs_write   ),
+    .mem2matrix     (id_mem2matrix),
+    .matrix_write   (id_matrix_write),
+    .matrix_write_mopa(id_matrix_write_mopa),
+    .mem_matrix2reg (id_mem_matrix2reg),
+    .mem_reg2matrix (id_mem_reg2matrix)
 );
 
 imm_gen u_imm_gen(
@@ -69,11 +105,15 @@ imm_gen u_imm_gen(
 );
 
 assign id_rd         = id_inst[11:7];
-assign id_func3_code = id_inst[14:12];
+assign id_func3_code = {id_inst[14:12], id_inst[6:0]} == `MtypeS ? 3'b010 : id_inst[14:12];
 assign id_func7_code = id_inst[30];
 
 assign id_rs1 = id_inst[19:15];
 assign id_rs2 = id_inst[24:20];
+assign id_matrix_index = ({id_inst[14:12], id_inst[6:0]} == `MtypeL || {id_inst[14:12], id_inst[6:0]} == `MtypeM2) ? id_inst[8:7] : 
+                         ({id_inst[14:12], id_inst[6:0]} == `MtypeM1|| {id_inst[14:12], id_inst[6:0]} == `MtypeS) ? id_inst[21:20] : 2'b00;
+
+assign id_matrix2mem = {id_inst[14:12], id_inst[6:0]} == `MtypeS ? 1'b1 : 1'b0; 
 
 //stall
 assign id_br           = (ctrl_stall == 1) ? 0 : br             ;
@@ -85,7 +125,5 @@ assign id_alu_src1     = (ctrl_stall == 1) ? 0 : alu_src1       ;
 assign id_alu_src2     = (ctrl_stall == 1) ? 0 : alu_src2       ; 
 assign id_br_addr_mode = (ctrl_stall == 1) ? 0 : br_addr_mode   ;       
 assign id_regs_write   = (ctrl_stall == 1) ? 0 : regs_write     ;             
-
-
 
 endmodule
